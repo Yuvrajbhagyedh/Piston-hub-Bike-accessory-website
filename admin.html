@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Piston Hub</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Italianno&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+      }
+      nav {
+        background-color: #000;
+        font-family: "Brygada 1918", serif;
+        font-style: italic;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+      }
+      .logo img {
+        height: 40px;
+        width: 60px;
+      }
+      nav ul {
+        list-style-type: none;
+        text-align: center;
+        margin-left: auto;
+      }
+      nav ul li {
+        display: inline;
+        margin-right: 20px;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+      }
+      h1 {
+        font-family: "Italianno", cursive;
+        font-size: 64px;
+        text-align: center;
+        margin: 40px 0 10px;
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto 60px;
+        padding: 0 16px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 20px;
+      }
+      .card {
+        background-color: #111;
+        border: 1px solid #222;
+        border-radius: 10px;
+        padding: 16px;
+      }
+      .card .label {
+        color: #bbb;
+        font-size: 13px;
+      }
+      .card .value {
+        font-size: 28px;
+        margin-top: 6px;
+        font-weight: 700;
+      }
+      .accent {
+        color: orange;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 14px;
+        margin-top: 14px;
+      }
+      .panel {
+        background-color: #111;
+        border: 1px solid #222;
+        border-radius: 10px;
+        padding: 16px;
+      }
+      .panel h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #222;
+        text-align: left;
+        font-size: 13px;
+      }
+      th {
+        color: #ccc;
+        font-weight: 700;
+      }
+      .pill {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid #333;
+        color: #ddd;
+        font-size: 12px;
+      }
+      .btnrow {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .btn {
+        padding: 10px 14px;
+        border-radius: 6px;
+        border: 1px solid #444;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+      }
+      .btn.primary {
+        background-color: orange;
+        border-color: orange;
+        color: #000;
+      }
+      .btn.primary:hover {
+        background-color: #ffc04d;
+        border-color: #ffc04d;
+      }
+      .btn:hover {
+        background-color: #1a1a1a;
+      }
+      .muted {
+        color: #bbb;
+        font-size: 13px;
+      }
+      @media (max-width: 900px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="index.html"
+          ><img
+            src="all images/piston hub white.png"
+            alt="Piston Hub logo"
+        /></a>
+      </div>
+      <ul>
+        <li><a href="index.html">Store</a></li>
+        <li><a href="cart.html">Cart</a></li>
+        <li>
+          <a id="navUserLink" href="login.html"
+            ><span id="navUserName">Login</span></a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <h1>Admin <span class="accent">Dashboard</span></h1>
+    <div class="wrap">
+      <div class="cards">
+        <div class="card">
+          <div class="label">Total orders</div>
+          <div class="value" id="kpiOrders">0</div>
+        </div>
+        <div class="card">
+          <div class="label">Total revenue</div>
+          <div class="value">₹<span id="kpiRevenue">0</span></div>
+        </div>
+        <div class="card">
+          <div class="label">Customers (unique)</div>
+          <div class="value" id="kpiCustomers">0</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <h2>Recent orders</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTbody"></tbody>
+          </table>
+          <div class="btnrow">
+            <button class="btn" id="clearOrdersBtn">Clear orders</button>
+            <button class="btn primary" onclick="window.location.href='slider.html'">
+              Go to Shop
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Quick actions</h2>
+          <div class="muted">
+            This dashboard uses localStorage (demo). Orders appear here after a
+            successful checkout.
+          </div>
+          <div class="btnrow" style="justify-content: flex-start">
+            <button class="btn primary" onclick="window.location.href='account.html'">
+              Account
+            </button>
+            <button class="btn" id="logoutBtn">Logout</button>
+          </div>
+          <div style="margin-top: 14px">
+            <span class="pill">Theme: black + orange</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      function formatTime(iso) {
+        try {
+          const d = new Date(iso);
+          return d.toLocaleString();
+        } catch {
+          return iso || '-';
+        }
+      }
+
+      function renderAdmin() {
+        const user = getCurrentUser();
+        if (!user || !user.isAdmin) {
+          window.location.href = 'admin-login.html';
+          return;
+        }
+
+        const orders = getOrders();
+        const revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+        const customers = new Set(
+          orders
+            .map((o) => (o.user && o.user.email ? o.user.email : null))
+            .filter(Boolean)
+        );
+
+        document.getElementById('kpiOrders').textContent = orders.length;
+        document.getElementById('kpiRevenue').textContent = revenue.toFixed(2);
+        document.getElementById('kpiCustomers').textContent = customers.size;
+
+        const tbody = document.getElementById('ordersTbody');
+        tbody.innerHTML = '';
+
+        if (!orders.length) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 5;
+          td.className = 'muted';
+          td.textContent = 'No orders yet. Place an order from Checkout to see it here.';
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+
+        orders.slice(0, 10).forEach((o) => {
+          const tr = document.createElement('tr');
+          const tdId = document.createElement('td');
+          tdId.textContent = o.id || '-';
+          const tdCustomer = document.createElement('td');
+          tdCustomer.textContent = o.user ? (o.user.name || o.user.email || '-') : 'Guest';
+          const tdItems = document.createElement('td');
+          const itemCount = (o.items || []).reduce((s, it) => s + (it.quantity || 0), 0);
+          tdItems.textContent = String(itemCount);
+          const tdTotal = document.createElement('td');
+          tdTotal.textContent = '₹' + (o.total || 0).toFixed(2);
+          const tdTime = document.createElement('td');
+          tdTime.textContent = formatTime(o.createdAt);
+          tr.appendChild(tdId);
+          tr.appendChild(tdCustomer);
+          tr.appendChild(tdItems);
+          tr.appendChild(tdTotal);
+          tr.appendChild(tdTime);
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        renderAdmin();
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          logoutUser();
+          window.location.href = 'index.html';
+        });
+
+        document.getElementById('clearOrdersBtn').addEventListener('click', () => {
+          localStorage.removeItem('pistonhub_orders_v1');
+          renderAdmin();
+        });
+      });
+    </script>
+  </body>
+</html>
+

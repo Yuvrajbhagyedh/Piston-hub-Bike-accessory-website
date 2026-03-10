@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account - Piston Hub</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Italianno&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+      }
+      nav {
+        background-color: #000;
+        font-family: "Brygada 1918", serif;
+        font-style: italic;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+      }
+      .logo img {
+        height: 40px;
+        width: 60px;
+      }
+      nav ul {
+        list-style-type: none;
+        text-align: center;
+        margin-left: auto;
+      }
+      nav ul li {
+        display: inline;
+        margin-right: 20px;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+      }
+      h1 {
+        font-family: "Italianno", cursive;
+        font-size: 64px;
+        text-align: center;
+        margin: 40px 0 10px;
+      }
+      .card {
+        max-width: 700px;
+        margin: 0 auto 60px;
+        background-color: #111;
+        padding: 20px;
+        border-radius: 10px;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid #222;
+        padding: 10px 0;
+      }
+      .row:last-child {
+        border-bottom: none;
+      }
+      .label {
+        color: #ccc;
+      }
+      .actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+      .btn {
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: 1px solid #444;
+        background-color: transparent;
+        color: #fff;
+        cursor: pointer;
+      }
+      .btn.primary {
+        background-color: orange;
+        border-color: orange;
+        color: #000;
+      }
+      .btn.primary:hover {
+        background-color: #ffc04d;
+        border-color: #ffc04d;
+      }
+      .btn:hover {
+        background-color: #1a1a1a;
+      }
+      .note {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #bbb;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="index.html"
+          ><img
+            src="all images/piston hub white.png"
+            alt="Piston Hub logo"
+        /></a>
+      </div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="slider.html">Shop</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact us page.html">Contact</a></li>
+        <li><a href="cart.html">Cart</a></li>
+        <li>
+          <a id="navUserLink" href="login.html"
+            ><span id="navUserName">Login</span></a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <h1>Account</h1>
+    <div class="card">
+      <div class="row">
+        <div class="label">Name</div>
+        <div id="userNameValue">-</div>
+      </div>
+      <div class="row">
+        <div class="label">Email</div>
+        <div id="userEmailValue">-</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" onclick="window.location.href='cart.html'">
+          View cart
+        </button>
+        <button id="adminBtn" class="btn primary" style="display: none">
+          Admin dashboard
+        </button>
+        <button class="btn" id="logoutBtn">Logout</button>
+      </div>
+
+      <div class="note">
+        Admin login for demo: <strong>admin@pistonhub.com</strong> /
+        <strong>admin123</strong>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const user = getCurrentUser();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        document.getElementById('userNameValue').textContent =
+          (user.name && user.name.trim()) ? user.name.trim() : '-';
+        document.getElementById('userEmailValue').textContent = user.email || '-';
+
+        const adminBtn = document.getElementById('adminBtn');
+        if (user.isAdmin) {
+          adminBtn.style.display = 'inline-block';
+          adminBtn.addEventListener('click', () => {
+            window.location.href = 'admin.html';
+          });
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          logoutUser();
+          updateAuthUI();
+          window.location.href = 'index.html';
+        });
+      });
+    </script>
+  </body>
+</html>
+

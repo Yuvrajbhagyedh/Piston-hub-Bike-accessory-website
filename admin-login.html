@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Piston Hub</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Italianno&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+      }
+      nav {
+        background-color: #000;
+        font-family: "Brygada 1918", serif;
+        font-style: italic;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+      }
+      .logo img {
+        height: 40px;
+        width: 60px;
+      }
+      nav ul {
+        list-style-type: none;
+        text-align: center;
+        margin-left: auto;
+      }
+      nav ul li {
+        display: inline;
+        margin-right: 20px;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+      }
+      h1 {
+        font-family: "Italianno", cursive;
+        font-size: 64px;
+        text-align: center;
+        margin: 40px 0 10px;
+      }
+      .box {
+        max-width: 420px;
+        margin: 0 auto 60px;
+        background-color: #111;
+        padding: 25px 20px 30px;
+        border-radius: 10px;
+        border: 1px solid #222;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 4px;
+        font-size: 14px;
+        color: #ddd;
+      }
+      input {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background-color: #000;
+        color: #fff;
+        box-sizing: border-box;
+      }
+      .btn {
+        width: 100%;
+        margin-top: 18px;
+        padding: 10px 16px;
+        background-color: orange;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background-color: #ffc04d;
+      }
+      .error {
+        display: none;
+        margin-top: 10px;
+        padding: 8px;
+        border-radius: 4px;
+        background-color: #4f1f1f;
+        color: #f6bdbd;
+        font-size: 13px;
+      }
+      .note {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #bbb;
+        text-align: center;
+      }
+      .note strong {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="index.html"
+          ><img
+            src="all images/piston hub white.png"
+            alt="Piston Hub logo"
+        /></a>
+      </div>
+      <ul>
+        <li><a href="index.html">Store</a></li>
+        <li><a href="cart.html">Cart</a></li>
+        <li>
+          <a id="navUserLink" href="login.html"
+            ><span id="navUserName">Login</span></a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <h1>Admin Login</h1>
+    <div class="box">
+      <form id="adminLoginForm">
+        <label for="email">Email</label>
+        <input id="email" type="email" required />
+
+        <label for="password">Password</label>
+        <input id="password" type="password" required />
+
+        <button class="btn" type="submit">Enter dashboard</button>
+        <div id="errorBox" class="error"></div>
+      </form>
+      <div class="note">
+        Demo admin: <strong>admin@pistonhub.com</strong> /
+        <strong>admin123</strong>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const user = getCurrentUser();
+        if (user && user.isAdmin) {
+          window.location.href = 'admin.html';
+          return;
+        }
+
+        const form = document.getElementById('adminLoginForm');
+        const errorBox = document.getElementById('errorBox');
+
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          errorBox.style.display = 'none';
+
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value;
+          const result = loginUser({ email, password });
+          if (!result.ok) {
+            errorBox.textContent = result.message || 'Unable to login';
+            errorBox.style.display = 'block';
+            return;
+          }
+          const u = getCurrentUser();
+          if (!u || !u.isAdmin) {
+            logoutUser();
+            errorBox.textContent = 'This account is not an admin.';
+            errorBox.style.display = 'block';
+            return;
+          }
+          window.location.href = 'admin.html';
+        });
+      });
+    </script>
+  </body>
+</html>
+

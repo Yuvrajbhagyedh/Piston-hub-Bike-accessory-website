@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Cart - Piston Hub</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Italianno&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+      }
+      nav {
+        background-color: #000;
+        font-family: "Brygada 1918", serif;
+        font-style: italic;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+      }
+      .logo img {
+        height: 40px;
+        width: 60px;
+      }
+      nav ul {
+        list-style-type: none;
+        text-align: center;
+        margin-left: auto;
+      }
+      nav ul li {
+        display: inline;
+        margin-right: 20px;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+      }
+      h1 {
+        font-family: "Italianno", cursive;
+        font-size: 64px;
+        text-align: center;
+        margin: 40px 0 10px;
+      }
+      .cart-container {
+        max-width: 900px;
+        margin: 0 auto 60px;
+        background-color: #111;
+        padding: 20px;
+        border-radius: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #333;
+      }
+      th {
+        background-color: #181818;
+      }
+      .cart-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+      .qty-input {
+        width: 60px;
+        padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+      }
+      .remove-btn {
+        background-color: transparent;
+        border: 1px solid #666;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .remove-btn:hover {
+        background-color: #b34d4d;
+        border-color: #b34d4d;
+      }
+      .cart-summary {
+        margin-top: 20px;
+        text-align: right;
+      }
+      .cart-summary p {
+        margin: 5px 0;
+      }
+      .checkout-btn {
+        margin-top: 15px;
+        padding: 12px 24px;
+        background-color: orange;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .checkout-btn:hover {
+        background-color: #ffc04d;
+      }
+      .empty-message {
+        text-align: center;
+        padding: 30px 0;
+        color: #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="index.html"
+          ><img
+            src="all images/piston hub white.png"
+            alt="Piston Hub logo"
+        /></a>
+      </div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="slider.html">Shop</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact us page.html">Contact</a></li>
+        <li><a href="cart.html">Cart</a></li>
+        <li><a id="navUserLink" href="login.html"><span id="navUserName">Login</span></a></li>
+      </ul>
+    </nav>
+
+    <h1>Your Cart</h1>
+    <div class="cart-container">
+      <div id="cartEmpty" class="empty-message" style="display: none">
+        Your cart is empty. Start shopping from the <a href="slider.html" style="color: orange;">Shop page</a>.
+      </div>
+      <table id="cartTable" style="display: none">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="cartBody"></tbody>
+      </table>
+      <div class="cart-summary" id="cartSummary" style="display: none">
+        <p><strong>Total items:</strong> <span id="summaryItems">0</span></p>
+        <p><strong>Total amount:</strong> ₹<span id="summaryTotal">0</span></p>
+        <button
+          class="checkout-btn"
+          onclick="window.location.href='checkout.html'"
+        >
+          Proceed to Payment
+        </button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      function renderCart() {
+        const cart = getCart();
+        const body = document.getElementById('cartBody');
+        const table = document.getElementById('cartTable');
+        const empty = document.getElementById('cartEmpty');
+        const summary = document.getElementById('cartSummary');
+        const itemsEl = document.getElementById('summaryItems');
+        const totalEl = document.getElementById('summaryTotal');
+
+        body.innerHTML = '';
+
+        if (!cart.length) {
+          table.style.display = 'none';
+          summary.style.display = 'none';
+          empty.style.display = 'block';
+          updateNavCartCount();
+          return;
+        }
+
+        empty.style.display = 'none';
+        table.style.display = 'table';
+        summary.style.display = 'block';
+
+        let totalItems = 0;
+        let totalAmount = 0;
+
+        cart.forEach((item) => {
+          const tr = document.createElement('tr');
+
+          const tdItem = document.createElement('td');
+          const img = document.createElement('img');
+          img.className = 'cart-image';
+          if (item.image) img.src = item.image;
+          img.alt = item.name;
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = ' ' + item.name;
+          tdItem.appendChild(img);
+          tdItem.appendChild(nameSpan);
+
+          const tdPrice = document.createElement('td');
+          tdPrice.textContent = '₹' + (item.price || 0);
+
+          const tdQty = document.createElement('td');
+          const qtyInput = document.createElement('input');
+          qtyInput.type = 'number';
+          qtyInput.min = '1';
+          qtyInput.value = item.quantity;
+          qtyInput.className = 'qty-input';
+          qtyInput.addEventListener('change', () => {
+            const val = parseInt(qtyInput.value, 10) || 1;
+            updateCartQuantity(item.id, val);
+            renderCart();
+          });
+          tdQty.appendChild(qtyInput);
+
+          const tdSubtotal = document.createElement('td');
+          const subtotal = (item.price || 0) * (item.quantity || 0);
+          tdSubtotal.textContent = '₹' + subtotal.toFixed(2);
+
+          const tdRemove = document.createElement('td');
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = 'Remove';
+          removeBtn.className = 'remove-btn';
+          removeBtn.addEventListener('click', () => {
+            removeFromCart(item.id);
+            renderCart();
+          });
+          tdRemove.appendChild(removeBtn);
+
+          tr.appendChild(tdItem);
+          tr.appendChild(tdPrice);
+          tr.appendChild(tdQty);
+          tr.appendChild(tdSubtotal);
+          tr.appendChild(tdRemove);
+
+          body.appendChild(tr);
+
+          totalItems += item.quantity || 0;
+          totalAmount += subtotal;
+        });
+
+        itemsEl.textContent = totalItems;
+        totalEl.textContent = totalAmount.toFixed(2);
+        updateNavCartCount();
+      }
+
+      document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+  </body>
+</html>
+

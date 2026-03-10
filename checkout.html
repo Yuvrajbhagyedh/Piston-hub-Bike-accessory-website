@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - Piston Hub</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Italianno&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+      }
+      nav {
+        background-color: #000;
+        font-family: "Brygada 1918", serif;
+        font-style: italic;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+      }
+      .logo img {
+        height: 40px;
+        width: 60px;
+      }
+      nav ul {
+        list-style-type: none;
+        text-align: center;
+        margin-left: auto;
+      }
+      nav ul li {
+        display: inline;
+        margin-right: 20px;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+      }
+      h1 {
+        font-family: "Italianno", cursive;
+        font-size: 64px;
+        text-align: center;
+        margin: 40px 0 10px;
+      }
+      .checkout-container {
+        max-width: 900px;
+        margin: 0 auto 60px;
+        background-color: #111;
+        padding: 20px;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 2fr 1.2fr;
+        gap: 20px;
+      }
+      .section-title {
+        margin-bottom: 10px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background-color: #000;
+        color: #fff;
+        box-sizing: border-box;
+      }
+      textarea {
+        resize: vertical;
+      }
+      .order-summary {
+        background-color: #181818;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+      .summary-total {
+        border-top: 1px solid #333;
+        margin-top: 10px;
+        padding-top: 10px;
+        font-weight: bold;
+      }
+      .pay-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px 24px;
+        background-color: orange;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .pay-btn:hover {
+        background-color: #ffc04d;
+      }
+      .success-message {
+        display: none;
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #1f4f2f;
+        color: #bdf6c8;
+        font-size: 14px;
+        text-align: center;
+      }
+      .empty-note {
+        text-align: center;
+        margin: 30px 0;
+        color: #ccc;
+      }
+      @media (max-width: 768px) {
+        .checkout-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <a href="index.html"
+          ><img
+            src="all images/piston hub white.png"
+            alt="Piston Hub logo"
+        /></a>
+      </div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="slider.html">Shop</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact us page.html">Contact</a></li>
+        <li><a href="cart.html">Cart</a></li>
+        <li><a id="navUserLink" href="login.html"><span id="navUserName">Login</span></a></li>
+      </ul>
+    </nav>
+
+    <h1>Checkout</h1>
+    <div class="checkout-container">
+      <form id="checkoutForm">
+        <div class="section-title">Shipping details</div>
+        <label for="fullName">Full name</label>
+        <input id="fullName" name="fullName" required />
+
+        <label for="address">Address</label>
+        <textarea id="address" name="address" rows="3" required></textarea>
+
+        <label for="city">City</label>
+        <input id="city" name="city" required />
+
+        <label for="pin">PIN / Postal code</label>
+        <input id="pin" name="pin" required />
+
+        <div class="section-title" style="margin-top: 20px">
+          Payment details
+        </div>
+        <label for="cardName">Name on card</label>
+        <input id="cardName" name="cardName" required />
+
+        <label for="cardNumber">Card number</label>
+        <input
+          id="cardNumber"
+          name="cardNumber"
+          inputmode="numeric"
+          pattern="[0-9]{12,19}"
+          required
+        />
+
+        <label for="expiry">Expiry (MM/YY)</label>
+        <input id="expiry" name="expiry" placeholder="MM/YY" required />
+
+        <label for="cvv">CVV</label>
+        <input
+          id="cvv"
+          name="cvv"
+          type="password"
+          inputmode="numeric"
+          pattern="[0-9]{3,4}"
+          required
+        />
+
+        <button class="pay-btn" type="submit">Pay securely</button>
+        <div id="successMessage" class="success-message">
+          Payment successful! Your order has been placed.
+        </div>
+        <div id="emptyNote" class="empty-note" style="display: none">
+          Your cart is empty. Please add items from the
+          <a href="slider.html" style="color: orange">Shop page</a> before
+          checking out.
+        </div>
+      </form>
+
+      <div class="order-summary">
+        <div class="section-title">Order summary</div>
+        <div id="summaryItemsContainer"></div>
+        <div class="summary-total">
+          Total: ₹<span id="summaryTotal">0</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      function renderOrderSummary() {
+        const itemsContainer = document.getElementById(
+          'summaryItemsContainer'
+        );
+        const totalEl = document.getElementById('summaryTotal');
+        const emptyNote = document.getElementById('emptyNote');
+        const cart = getCart();
+
+        itemsContainer.innerHTML = '';
+
+        if (!cart.length) {
+          emptyNote.style.display = 'block';
+          totalEl.textContent = '0.00';
+          return;
+        }
+
+        emptyNote.style.display = 'none';
+        let total = 0;
+
+        cart.forEach((item) => {
+          const row = document.createElement('div');
+          row.className = 'summary-item';
+          const name = document.createElement('span');
+          name.textContent = `${item.name} × ${item.quantity}`;
+          const price = document.createElement('span');
+          const subtotal = (item.price || 0) * (item.quantity || 0);
+          price.textContent = '₹' + subtotal.toFixed(2);
+          row.appendChild(name);
+          row.appendChild(price);
+          itemsContainer.appendChild(row);
+          total += subtotal;
+        });
+
+        totalEl.textContent = total.toFixed(2);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        renderOrderSummary();
+
+        const form = document.getElementById('checkoutForm');
+        const successMsg = document.getElementById('successMessage');
+        const emptyNote = document.getElementById('emptyNote');
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const cart = getCart();
+          if (!cart.length) {
+            emptyNote.style.display = 'block';
+            return;
+          }
+          const total = cart.reduce(
+            (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
+            0
+          );
+          const shipping = {
+            fullName: document.getElementById('fullName').value.trim(),
+            address: document.getElementById('address').value.trim(),
+            city: document.getElementById('city').value.trim(),
+            pin: document.getElementById('pin').value.trim(),
+          };
+          createOrder({ items: cart, total, shipping });
+          successMsg.style.display = 'block';
+          clearCart();
+          updateNavCartCount();
+          renderOrderSummary();
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+        });
+      });
+    </script>
+  </body>
+</html>
+
