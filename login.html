@@ -111,6 +111,7 @@
         font-size: 13px;
       }
     </style>
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <nav>
@@ -136,10 +137,10 @@
       <div id="userGreeting" style="display: none; margin-bottom: 15px"></div>
       <form id="loginForm">
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" required />
+        <input id="email" name="email" type="email" autocomplete="email" required />
 
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" required />
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
 
         <button class="primary-btn" type="submit">Login</button>
         <div id="errorBox" class="error"></div>
@@ -153,19 +154,19 @@
 
     <script src="script.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', async () => {
         const form = document.getElementById('loginForm');
         const errorBox = document.getElementById('errorBox');
         const successBox = document.getElementById('successBox');
         const greeting = document.getElementById('userGreeting');
 
-        const user = getCurrentUser();
+        const user = await fetchCurrentUser();
         if (user) {
           greeting.style.display = 'block';
           greeting.textContent = 'You are logged in as ' + (user.name || user.email);
         }
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
           e.preventDefault();
           errorBox.style.display = 'none';
           successBox.style.display = 'none';
@@ -173,7 +174,7 @@
           const email = document.getElementById('email').value.trim();
           const password = document.getElementById('password').value;
 
-          const result = loginUser({ email, password });
+          const result = await loginUser({ email, password });
           if (!result.ok) {
             errorBox.textContent = result.message || 'Unable to login';
             errorBox.style.display = 'block';
@@ -181,15 +182,14 @@
           }
           successBox.textContent = 'Login successful! Redirecting...';
           successBox.style.display = 'block';
-          updateAuthUI();
+          await updateAuthUI();
           setTimeout(() => {
-            const current = getCurrentUser();
-            if (current && current.isAdmin) {
+            if (result.user && result.user.isAdmin) {
               window.location.href = 'admin.html';
             } else {
               window.location.href = 'index.html';
             }
-          }, 1500);
+          }, 1000);
         });
       });
     </script>

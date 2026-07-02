@@ -1,16 +1,7 @@
-// Simple client-side cart and auth handling using localStorage
+// Client-side cart (localStorage) + auth via the backend API.
+// Passwords and roles are handled server-side only.
 
 const CART_KEY = 'pistonhub_cart_v1';
-const USERS_KEY = 'pistonhub_users_v1';
-const CURRENT_USER_KEY = 'pistonhub_current_user_v1';
-const ORDERS_KEY = 'pistonhub_orders_v1';
-
-const ADMIN_DEFAULT = {
-  name: 'Admin',
-  email: 'admin@pistonhub.com',
-  password: 'admin123',
-  isAdmin: true,
-};
 
 // ---------- CART ----------
 
@@ -98,7 +89,7 @@ function wireProductAddToCart() {
       const rawPrice = priceEl ? priceEl.textContent : '0';
       const price = parseFloat(rawPrice.replace(/[^0-9.]/g, '')) || 0;
       const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value, 10) || 1) : 1;
-      const id = name.toLowerCase().replace(/\s+/g, '-');
+      const id = productEl.dataset.productId || name.toLowerCase().replace(/\s+/g, '-');
       const image = imgEl ? imgEl.getAttribute('src') || '' : '';
 
       addToCart({ id, name, price, image }, quantity);
@@ -110,78 +101,68 @@ function wireProductAddToCart() {
   });
 }
 
-// ---------- AUTH (demo only, not secure) ----------
+// ---------- AUTH (backend API) ----------
 
-function getUsers() {
+let __currentUser = null;
+let __currentUserLoaded = false;
+
+async function apiFetch(path, options = {}) {
+  const res = await fetch(path, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    ...options,
+  });
+  let data = null;
   try {
-    const raw = localStorage.getItem(USERS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    data = await res.json();
   } catch (e) {
-    return [];
+    /* non-JSON response */
   }
+  return { ok: res.ok, status: res.status, data };
 }
 
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+async function fetchCurrentUser(force = false) {
+  if (__currentUserLoaded && !force) return __currentUser;
+  const { ok, data } = await apiFetch('/api/auth/me');
+  __currentUser = ok && data ? data.user : null;
+  __currentUserLoaded = true;
+  return __currentUser;
 }
 
-function seedAdminUser() {
-  const users = getUsers();
-  const existing = users.find((u) => u.email === ADMIN_DEFAULT.email);
-  if (existing) return;
-  users.push({ ...ADMIN_DEFAULT });
-  saveUsers(users);
+async function signupUser({ name, email, password }) {
+  const { ok, data } = await apiFetch('/api/auth/signup', {
+    method: 'POST',
+    body: JSON.stringify({ name, email, password }),
+  });
+  if (!ok) return { ok: false, message: (data && data.error) || 'Unable to sign up' };
+  __currentUser = data.user;
+  __currentUserLoaded = true;
+  return { ok: true, user: data.user };
 }
 
-function getCurrentUser() {
-  try {
-    const raw = localStorage.getItem(CURRENT_USER_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    return null;
-  }
+async function loginUser({ email, password }) {
+  const { ok, data } = await apiFetch('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+  if (!ok) return { ok: false, message: (data && data.error) || 'Unable to login' };
+  __currentUser = data.user;
+  __currentUserLoaded = true;
+  return { ok: true, user: data.user };
 }
 
-function setCurrentUser(user) {
-  if (user) {
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(CURRENT_USER_KEY);
-  }
+async function logoutUser() {
+  await apiFetch('/api/auth/logout', { method: 'POST' });
+  __currentUser = null;
+  __currentUserLoaded = true;
 }
 
-function signupUser({ name, email, password }) {
-  const users = getUsers();
-  if (users.find((u) => u.email === email)) {
-    return { ok: false, message: 'Email already registered' };
-  }
-  const user = { name: name || '', email, password, isAdmin: false };
-  users.push(user);
-  saveUsers(users);
-  setCurrentUser({ name: user.name, email: user.email });
-  return { ok: true };
-}
-
-function loginUser({ email, password }) {
-  const users = getUsers();
-  const match = users.find((u) => u.email === email && u.password === password);
-  if (!match) {
-    return { ok: false, message: 'Invalid email or password' };
-  }
-  setCurrentUser({ name: match.name, email: match.email, isAdmin: !!match.isAdmin });
-  return { ok: true };
-}
-
-function logoutUser() {
-  setCurrentUser(null);
-}
-
-function updateAuthUI() {
-  const user = getCurrentUser();
+async function updateAuthUI() {
   const nameEl = document.getElementById('navUserName');
   const linkEl = document.getElementById('navUserLink');
   if (!nameEl || !linkEl) return;
 
+  const user = await fetchCurrentUser();
   if (!user) {
     nameEl.textContent = 'Login';
     linkEl.setAttribute('href', 'login.html');
@@ -197,48 +178,34 @@ function updateAuthUI() {
   }
 }
 
-function isAdmin() {
-  const user = getCurrentUser();
-  return !!(user && user.isAdmin);
-}
+// ---------- ORDERS ----------
 
-// ---------- ORDERS (for admin dashboard) ----------
-
-function getOrders() {
-  try {
-    const raw = localStorage.getItem(ORDERS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
+async function createOrder({ items, shipping }) {
+  const { ok, status, data } = await apiFetch('/api/orders', {
+    method: 'POST',
+    body: JSON.stringify({ items, shipping }),
+  });
+  if (!ok) {
+    return {
+      ok: false,
+      loginRequired: status === 401,
+      message: (data && data.error) || 'Unable to place order',
+    };
   }
+  return { ok: true, order: data.order };
 }
 
-function saveOrders(orders) {
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-}
+// ---------- PRODUCTS ----------
 
-function createOrder({ items, total, shipping }) {
-  const user = getCurrentUser();
-  const order = {
-    id: 'ORD-' + Date.now(),
-    createdAt: new Date().toISOString(),
-    user: user ? { name: user.name || '', email: user.email || '' } : null,
-    items: items || [],
-    total: total || 0,
-    shipping: shipping || null,
-  };
-  const orders = getOrders();
-  orders.unshift(order);
-  saveOrders(orders);
-  return order;
+async function fetchProducts() {
+  const { ok, data } = await apiFetch('/api/products');
+  return ok && data ? data.products : [];
 }
 
 // ---------- Page wiring ----------
 
 document.addEventListener('DOMContentLoaded', () => {
-  seedAdminUser();
   updateNavCartCount();
   updateAuthUI();
   wireProductAddToCart();
 });
-

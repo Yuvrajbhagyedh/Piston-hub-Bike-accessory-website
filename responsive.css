@@ -1,0 +1,259 @@
+/* ============================================================
+   Piston Hub — shared mobile / responsive overrides
+   Loaded after each page's own styles so these rules win.
+   Breakpoints: 900px (tablet), 768px (large phone), 600px (phone)
+   ============================================================ */
+
+/* ---------- Tablet: shop & brand product grids go 2-up ---------- */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ---------- Large phones and below ---------- */
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* --- Navigation: logo on top, links wrap underneath --- */
+  nav {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px;
+    padding: 14px 8px !important;
+  }
+  nav ul {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 14px;
+  }
+  nav ul li {
+    margin-right: 0 !important;
+    font-size: 16px;
+  }
+
+  /* --- Headings: the Italianno 54-95px titles shrink --- */
+  h1 {
+    font-size: 42px !important;
+    padding: 0 10px;
+  }
+
+  /* --- Footer: 4 columns stack vertically, centered --- */
+  .containerfooter,
+  footer .container {
+    flex-direction: column !important;
+    align-items: center;
+    text-align: center;
+    padding: 16px 12px 30px !important;
+  }
+  .containerfooter .column,
+  footer .container .column,
+  .column {
+    flex-basis: 100% !important;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    padding: 10px 14px !important;
+    margin: 0 auto;
+  }
+
+  /* --- Tables (cart, admin): scroll sideways instead of squishing --- */
+  .cart-container,
+  .panel {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cart-container table,
+  .panel table {
+    min-width: 540px;
+  }
+  th,
+  td {
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+  .cart-container {
+    margin: 0 10px 40px !important;
+    padding: 12px !important;
+  }
+
+  /* --- Shop page image slider: fixed side margins break phones --- */
+  .image-slider {
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    height: 200px !important;
+  }
+  .dots {
+    margin-left: 0 !important;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* --- Shop filters --- */
+  .search {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .search-bar,
+  .category-dropdown {
+    display: block;
+    width: 88% !important;
+    max-width: 360px;
+    margin: 6px auto !important;
+    box-sizing: border-box;
+  }
+
+  /* --- Checkout: form and summary stack --- */
+  .checkout-container {
+    grid-template-columns: 1fr !important;
+    margin: 0 10px 40px !important;
+  }
+
+  /* --- Auth / account cards: breathing room on the sides --- */
+  .box,
+  .auth-container,
+  .card {
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+  }
+
+  /* --- Admin dashboard: KPI cards and panels single-column --- */
+  .cards,
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+  .wrap {
+    padding: 0 12px 40px !important;
+  }
+  .btnrow {
+    justify-content: center !important;
+  }
+
+  /* --- Product detail pages --- */
+  .product-details {
+    padding: 14px !important;
+  }
+  .buttons .btn {
+    display: block;
+    width: 100%;
+    margin: 8px 0 !important;
+    box-sizing: border-box;
+  }
+  .reviews {
+    padding: 0 6px;
+  }
+
+  /* ============ index.html (landing page) ============ */
+  .hero {
+    height: auto !important;
+    min-height: 55vh;
+    padding: 60px 12px !important;
+    background-size: cover;
+    background-position: center;
+  }
+  .pp {
+    font-size: 54px !important;
+    margin-top: 30px !important;
+  }
+  .pp1 {
+    font-size: 20px !important;
+    margin: 0 14px;
+  }
+  .brands {
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+  }
+  .upgrade-your-ride {
+    height: auto !important;
+    padding: 0 12px 40px;
+  }
+  .upgrade-your-ride h2 {
+    font-size: 40px !important;
+    margin-top: 30px !important;
+  }
+  .upgrade-your-ride p {
+    margin: 0 8px !important;
+  }
+  .upgrade-container {
+    width: 60% !important;
+  }
+  .thirdimagecontainer {
+    flex-direction: column !important;
+    margin-top: 40px !important;
+    gap: 16px;
+  }
+  .thirdimagecontainer img,
+  .first,
+  .first1 {
+    width: 92% !important;
+    margin: 0 auto !important;
+  }
+  .text {
+    font-size: 18px !important;
+    margin: 12px 16px !important;
+  }
+  .text1 {
+    margin: 12px 16px !important;
+  }
+  .image-container {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .image {
+    width: 44% !important;
+    margin: 8px !important;
+  }
+  .testimonials {
+    padding: 40px 0 !important;
+  }
+  .testimonials h2 {
+    font-size: 3em !important;
+    margin-bottom: 30px !important;
+  }
+  .testimonial-container {
+    flex-direction: column !important;
+    align-items: center;
+  }
+  .testimonial {
+    width: 82% !important;
+    height: auto !important;
+    margin: 10px auto !important;
+  }
+  .certified-section {
+    flex-direction: column !important;
+    text-align: center;
+    padding: 20px 12px;
+  }
+
+  /* --- About / contact --- */
+  .intro,
+  .story {
+    padding: 0 16px;
+  }
+}
+
+/* ---------- Phones: product grids single column ---------- */
+@media (max-width: 600px) {
+  .container {
+    grid-template-columns: 1fr !important;
+  }
+  h1 {
+    font-size: 36px !important;
+  }
+}

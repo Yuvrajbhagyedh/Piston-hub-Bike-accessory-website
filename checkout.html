@@ -133,6 +133,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <nav>
@@ -170,41 +171,27 @@
         <input id="pin" name="pin" required />
 
         <div class="section-title" style="margin-top: 20px">
-          Payment details
+          Payment
         </div>
-        <label for="cardName">Name on card</label>
-        <input id="cardName" name="cardName" required />
+        <div class="empty-note" style="display: block">
+          This is a demo store — no real payment is taken and no card details
+          are collected. Orders are placed as "Pay on delivery".
+        </div>
 
-        <label for="cardNumber">Card number</label>
-        <input
-          id="cardNumber"
-          name="cardNumber"
-          inputmode="numeric"
-          pattern="[0-9]{12,19}"
-          required
-        />
-
-        <label for="expiry">Expiry (MM/YY)</label>
-        <input id="expiry" name="expiry" placeholder="MM/YY" required />
-
-        <label for="cvv">CVV</label>
-        <input
-          id="cvv"
-          name="cvv"
-          type="password"
-          inputmode="numeric"
-          pattern="[0-9]{3,4}"
-          required
-        />
-
-        <button class="pay-btn" type="submit">Pay securely</button>
+        <button class="pay-btn" type="submit">Place order (pay on delivery)</button>
         <div id="successMessage" class="success-message">
-          Payment successful! Your order has been placed.
+          Order placed successfully!
         </div>
+        <div id="errorMessage" class="empty-note" style="display: none"></div>
         <div id="emptyNote" class="empty-note" style="display: none">
           Your cart is empty. Please add items from the
           <a href="slider.html" style="color: orange">Shop page</a> before
           checking out.
+        </div>
+        <div id="loginNote" class="empty-note" style="display: none">
+          Please <a href="login.html" style="color: orange">log in</a> or
+          <a href="signup.html" style="color: orange">create an account</a>
+          to place an order.
         </div>
       </form>
 
@@ -255,38 +242,56 @@
         totalEl.textContent = total.toFixed(2);
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', async () => {
         renderOrderSummary();
 
         const form = document.getElementById('checkoutForm');
         const successMsg = document.getElementById('successMessage');
+        const errorMsg = document.getElementById('errorMessage');
         const emptyNote = document.getElementById('emptyNote');
+        const loginNote = document.getElementById('loginNote');
 
-        form.addEventListener('submit', function (e) {
+        const user = await fetchCurrentUser();
+        if (!user) {
+          loginNote.style.display = 'block';
+        }
+
+        form.addEventListener('submit', async function (e) {
           e.preventDefault();
+          errorMsg.style.display = 'none';
           const cart = getCart();
           if (!cart.length) {
             emptyNote.style.display = 'block';
             return;
           }
-          const total = cart.reduce(
-            (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
-            0
-          );
           const shipping = {
             fullName: document.getElementById('fullName').value.trim(),
             address: document.getElementById('address').value.trim(),
             city: document.getElementById('city').value.trim(),
             pin: document.getElementById('pin').value.trim(),
           };
-          createOrder({ items: cart, total, shipping });
+
+          const result = await createOrder({ items: cart, shipping });
+          if (!result.ok) {
+            if (result.loginRequired) {
+              loginNote.style.display = 'block';
+            } else {
+              errorMsg.textContent = result.message;
+              errorMsg.style.display = 'block';
+            }
+            return;
+          }
+
+          successMsg.textContent =
+            'Order ' + result.order.id + ' placed successfully! Total: ₹' +
+            result.order.total.toFixed(2);
           successMsg.style.display = 'block';
           clearCart();
           updateNavCartCount();
           renderOrderSummary();
           setTimeout(() => {
             window.location.href = 'index.html';
-          }, 2000);
+          }, 2500);
         });
       });
     </script>

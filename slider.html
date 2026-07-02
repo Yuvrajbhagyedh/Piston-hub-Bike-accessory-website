@@ -364,6 +364,7 @@ margin-right: 10px;
     margin-bottom: 0px;
   }
     </style>
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     
@@ -489,7 +490,7 @@ margin-right: 10px;
         </div>
       </div>
       <div class="product" data-name="Apex Boots" data-category="Boots">
-       <a href="apex boots.html" target="_blank"> <img
+       <a href="apex boots.html" target="_blank" rel="noopener noreferrer"> <img
           class="product-image"
           src="all images/Untitled design - 2024-05-07T124400.733.png"
           alt="Product 1"
@@ -512,7 +513,7 @@ margin-right: 10px;
         </div>
       </div>
       <div class="product" data-name="Apex Marvel Boots" data-category="Boots">
-        <a href="apex marvel boots.html" target="_blank"><img
+        <a href="apex marvel boots.html" target="_blank" rel="noopener noreferrer"><img
           class="product-image"
           src="all images/Untitled design - 2024-05-07T124411.595.png"
           alt="Product 1"
@@ -535,7 +536,7 @@ margin-right: 10px;
         </div>
       </div>
       <div class="product" data-name="Apex Marvel Venom Helmet" data-category="Helmets">
-       <a href="apex marvel venom helmet.html" target="_blank"> <img
+       <a href="apex marvel venom helmet.html" target="_blank" rel="noopener noreferrer"> <img
           class="product-image"
           src="all images/axor venom.png"
           alt="Product 1"
@@ -558,7 +559,7 @@ margin-right: 10px;
         </div>
       </div>
       <div class="product" data-name="Apex Hunter Boots" data-category="Boots">
-       <a href="apex hunter boots.html" target="_blank"> <img
+       <a href="apex hunter boots.html" target="_blank" rel="noopener noreferrer"> <img
           class="product-image"
           src="all images/Untitled design - 2024-05-07T124425.284.png"
           alt="Product 1"
@@ -609,7 +610,7 @@ margin-right: 10px;
       <!-- Repeat for other products -->
       <!-- Product 3 -->
       <div class="product" data-name="Apex Dynamo Helmet" data-category="Helmets">
-       <a href="apex dynamo helmet.html" target="_blank"> <img
+       <a href="apex dynamo helmet.html" target="_blank" rel="noopener noreferrer"> <img
           class="product-image"
           src="all images/axor helmet3.png"
           alt="Product 3"
@@ -665,7 +666,7 @@ margin-right: 10px;
       <!-- Repeat for other products -->
       <!-- Product 5 -->
       <div class="product" data-name="Vega Max" data-category="Helmets">
-       <a href="vega max.html" target="_blank"> <img
+       <a href="vega max.html" target="_blank" rel="noopener noreferrer"> <img
           class="product-image"
           src="all images/axor helmet5.png"
           alt="Product 5"
@@ -691,7 +692,7 @@ margin-right: 10px;
       <!-- Repeat for other products -->
       <!-- Product 6 -->
       <div class="product" data-name="Apex Solid Helmet" data-category="Helmets">
-       <a href="apex solid helmet.html" target="_blank"> <img
+       <a href="apex solid helmet.html" target="_blank" rel="noopener noreferrer"> <img
           class="product-image"
           src="all images/axor pr6.png"
           alt="Product 6"
@@ -778,6 +779,91 @@ margin-right: 10px;
         var alertBox = document.getElementById("customAlert");
         alertBox.style.display = "none";
       }
+
+      // Render products added from the admin dashboard (fetched from the API).
+      // Static cards already on the page are skipped by id.
+      async function renderDynamicProducts() {
+        let products = [];
+        try {
+          products = await fetchProducts();
+        } catch (e) {
+          return; // API not reachable (e.g. opened as a plain file)
+        }
+
+        const container = document.querySelector('.container');
+        if (!container) return;
+
+        const staticIds = new Set(
+          Array.from(document.querySelectorAll('.product .product-title')).map((el) =>
+            el.textContent.trim().toLowerCase().replace(/\s+/g, '-')
+          )
+        );
+
+        products
+          .filter((p) => !staticIds.has(p.id))
+          .forEach((p) => {
+            const card = document.createElement('div');
+            card.className = 'product';
+            card.dataset.name = p.name;
+            card.dataset.category =
+              p.category.charAt(0).toUpperCase() + p.category.slice(1);
+            card.dataset.productId = p.id;
+
+            const img = document.createElement('img');
+            img.className = 'product-image';
+            img.src = p.image || 'all images/sample.png';
+            img.alt = p.name;
+
+            const details = document.createElement('div');
+            details.className = 'product-details';
+
+            const title = document.createElement('h2');
+            title.className = 'product-title';
+            title.textContent = p.name;
+
+            const price = document.createElement('p');
+            price.className = 'product-price';
+            price.textContent = '₹' + Number(p.price).toFixed(2);
+
+            const qtyBar = document.createElement('div');
+            qtyBar.className = 'quantity-bar';
+            const minus = document.createElement('button');
+            minus.className = 'quantity-control';
+            minus.textContent = '-';
+            minus.setAttribute('onclick', 'changeQuantity(this, -1)');
+            const qty = document.createElement('input');
+            qty.className = 'quantity-input';
+            qty.type = 'text';
+            qty.value = '1';
+            const plus = document.createElement('button');
+            plus.className = 'quantity-control';
+            plus.textContent = '+';
+            plus.setAttribute('onclick', 'changeQuantity(this, 1)');
+            qtyBar.appendChild(minus);
+            qtyBar.appendChild(qty);
+            qtyBar.appendChild(plus);
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-to-cart';
+            addBtn.textContent = 'Add to Cart';
+            addBtn.addEventListener('click', () =>
+              showAlert('all images/tick mark.jpg')
+            );
+
+            details.appendChild(title);
+            details.appendChild(price);
+            details.appendChild(qtyBar);
+            details.appendChild(addBtn);
+            card.appendChild(img);
+            card.appendChild(details);
+            container.appendChild(card);
+          });
+
+        // Bind cart behavior on the newly added buttons
+        wireProductAddToCart();
+      }
+
+      document.addEventListener('DOMContentLoaded', renderDynamicProducts);
 
       function changeQuantity(button, change) {
         var input = button.parentElement.querySelector(".quantity-input");

@@ -150,6 +150,39 @@
         color: #bbb;
         font-size: 13px;
       }
+      .field-label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 4px;
+        font-size: 13px;
+        color: #ddd;
+      }
+      .field {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background-color: #000;
+        color: #fff;
+        box-sizing: border-box;
+        font-family: inherit;
+      }
+      .row-btn {
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .row-btn:hover {
+        background-color: #1a1a1a;
+      }
+      .row-btn.danger {
+        border-color: #703030;
+        color: #f6bdbd;
+      }
       @media (max-width: 900px) {
         .cards {
           grid-template-columns: 1fr;
@@ -159,6 +192,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <nav>
@@ -223,8 +257,8 @@
         <div class="panel">
           <h2>Quick actions</h2>
           <div class="muted">
-            This dashboard uses localStorage (demo). Orders appear here after a
-            successful checkout.
+            Orders and products are stored on the server. Orders appear here
+            after a successful checkout.
           </div>
           <div class="btnrow" style="justify-content: flex-start">
             <button class="btn primary" onclick="window.location.href='account.html'">
@@ -237,32 +271,82 @@
           </div>
         </div>
       </div>
+
+      <div class="grid" style="margin-top: 20px; grid-template-columns: 1fr 1.4fr">
+        <div class="panel">
+          <h2 id="productFormTitle">Add product</h2>
+          <form id="productForm">
+            <label class="field-label" for="pName">Name</label>
+            <input class="field" id="pName" maxlength="120" required />
+
+            <label class="field-label" for="pPrice">Price</label>
+            <input class="field" id="pPrice" type="number" min="0" max="1000000" step="0.01" required />
+
+            <label class="field-label" for="pCategory">Category</label>
+            <select class="field" id="pCategory">
+              <option value="helmet">Helmet</option>
+              <option value="gloves">Gloves</option>
+              <option value="boots">Boots</option>
+              <option value="tools">Tools</option>
+              <option value="accessories">Accessories</option>
+              <option value="other">Other</option>
+            </select>
+
+            <label class="field-label" for="pImage">Image (path under "all images/" or https URL)</label>
+            <input class="field" id="pImage" maxlength="500" placeholder="all images/sample.png" />
+
+            <label class="field-label" for="pStock">Stock</label>
+            <input class="field" id="pStock" type="number" min="0" step="1" value="10" />
+
+            <label class="field-label" for="pDescription">Description</label>
+            <textarea class="field" id="pDescription" rows="3" maxlength="1000"></textarea>
+
+            <div class="btnrow" style="justify-content: flex-start">
+              <button class="btn primary" type="submit" id="productSaveBtn">Add product</button>
+              <button class="btn" type="button" id="productCancelBtn" style="display: none">Cancel edit</button>
+            </div>
+            <div id="productMsg" class="muted" style="margin-top: 10px"></div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>Products</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="productsTbody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
     <script>
       function formatTime(iso) {
         try {
-          const d = new Date(iso);
+          const d = new Date(iso.includes('T') ? iso : iso + 'Z');
           return d.toLocaleString();
         } catch {
           return iso || '-';
         }
       }
 
-      function renderAdmin() {
-        const user = getCurrentUser();
-        if (!user || !user.isAdmin) {
-          window.location.href = 'admin-login.html';
-          return;
-        }
+      let editingId = null;
 
-        const orders = getOrders();
+      async function loadOrders() {
+        const { ok, data } = await apiFetch('/api/admin/orders');
+        const orders = ok && data ? data.orders : [];
+
         const revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
         const customers = new Set(
-          orders
-            .map((o) => (o.user && o.user.email ? o.user.email : null))
-            .filter(Boolean)
+          orders.map((o) => (o.user && o.user.email) || null).filter(Boolean)
         );
 
         document.getElementById('kpiOrders').textContent = orders.length;
@@ -270,7 +354,7 @@
         document.getElementById('kpiCustomers').textContent = customers.size;
 
         const tbody = document.getElementById('ordersTbody');
-        tbody.innerHTML = '';
+        tbody.textContent = '';
 
         if (!orders.length) {
           const tr = document.createElement('tr');
@@ -305,17 +389,145 @@
         });
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        renderAdmin();
+      async function loadProducts() {
+        const products = await fetchProducts();
+        const tbody = document.getElementById('productsTbody');
+        tbody.textContent = '';
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-          logoutUser();
+        if (!products.length) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 5;
+          td.className = 'muted';
+          td.textContent = 'No products yet. Add one with the form.';
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+
+        products.forEach((p) => {
+          const tr = document.createElement('tr');
+
+          const tdName = document.createElement('td');
+          tdName.textContent = p.name;
+          const tdPrice = document.createElement('td');
+          tdPrice.textContent = '₹' + Number(p.price).toFixed(2);
+          const tdCategory = document.createElement('td');
+          tdCategory.textContent = p.category;
+          const tdStock = document.createElement('td');
+          tdStock.textContent = String(p.stock);
+
+          const tdActions = document.createElement('td');
+          const editBtn = document.createElement('button');
+          editBtn.className = 'row-btn';
+          editBtn.textContent = 'Edit';
+          editBtn.addEventListener('click', () => startEdit(p));
+          const delBtn = document.createElement('button');
+          delBtn.className = 'row-btn danger';
+          delBtn.textContent = 'Delete';
+          delBtn.style.marginLeft = '6px';
+          delBtn.addEventListener('click', async () => {
+            if (!window.confirm(`Delete "${p.name}"?`)) return;
+            const { ok, data } = await apiFetch(
+              '/api/admin/products/' + encodeURIComponent(p.id),
+              { method: 'DELETE' }
+            );
+            setProductMsg(ok ? 'Product deleted.' : (data && data.error) || 'Delete failed');
+            loadProducts();
+          });
+          tdActions.appendChild(editBtn);
+          tdActions.appendChild(delBtn);
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdPrice);
+          tr.appendChild(tdCategory);
+          tr.appendChild(tdStock);
+          tr.appendChild(tdActions);
+          tbody.appendChild(tr);
+        });
+      }
+
+      function setProductMsg(msg) {
+        document.getElementById('productMsg').textContent = msg || '';
+      }
+
+      function startEdit(p) {
+        editingId = p.id;
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pPrice').value = p.price;
+        document.getElementById('pCategory').value = p.category || 'other';
+        document.getElementById('pImage').value = p.image || '';
+        document.getElementById('pStock').value = p.stock;
+        document.getElementById('pDescription').value = p.description || '';
+        document.getElementById('productFormTitle').textContent = 'Edit product';
+        document.getElementById('productSaveBtn').textContent = 'Save changes';
+        document.getElementById('productCancelBtn').style.display = 'inline-block';
+        setProductMsg('Editing "' + p.name + '"');
+      }
+
+      function resetForm() {
+        editingId = null;
+        document.getElementById('productForm').reset();
+        document.getElementById('pStock').value = 10;
+        document.getElementById('productFormTitle').textContent = 'Add product';
+        document.getElementById('productSaveBtn').textContent = 'Add product';
+        document.getElementById('productCancelBtn').style.display = 'none';
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        // Server-verified access: /api/admin/* returns 403 unless the session
+        // user is an admin, so this redirect is UX only, not the security boundary.
+        const user = await fetchCurrentUser();
+        if (!user || !user.isAdmin) {
+          window.location.href = 'admin-login.html';
+          return;
+        }
+
+        loadOrders();
+        loadProducts();
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+          await logoutUser();
           window.location.href = 'index.html';
         });
 
-        document.getElementById('clearOrdersBtn').addEventListener('click', () => {
-          localStorage.removeItem('pistonhub_orders_v1');
-          renderAdmin();
+        document.getElementById('clearOrdersBtn').addEventListener('click', async () => {
+          if (!window.confirm('Delete ALL orders? This cannot be undone.')) return;
+          await apiFetch('/api/admin/orders', { method: 'DELETE' });
+          loadOrders();
+        });
+
+        document.getElementById('productCancelBtn').addEventListener('click', () => {
+          resetForm();
+          setProductMsg('');
+        });
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const body = {
+            name: document.getElementById('pName').value.trim(),
+            price: Number(document.getElementById('pPrice').value),
+            category: document.getElementById('pCategory').value,
+            image: document.getElementById('pImage').value.trim(),
+            stock: parseInt(document.getElementById('pStock').value, 10) || 0,
+            description: document.getElementById('pDescription').value.trim(),
+          };
+
+          const path = editingId
+            ? '/api/admin/products/' + encodeURIComponent(editingId)
+            : '/api/admin/products';
+          const { ok, data } = await apiFetch(path, {
+            method: editingId ? 'PUT' : 'POST',
+            body: JSON.stringify(body),
+          });
+
+          if (!ok) {
+            setProductMsg((data && data.error) || 'Unable to save product');
+            return;
+          }
+          setProductMsg(editingId ? 'Product updated.' : 'Product added. It now appears on the Shop page.');
+          resetForm();
+          loadProducts();
         });
       });
     </script>

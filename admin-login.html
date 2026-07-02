@@ -104,6 +104,7 @@
         color: #fff;
       }
     </style>
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <nav>
@@ -138,15 +139,14 @@
         <div id="errorBox" class="error"></div>
       </form>
       <div class="note">
-        Demo admin: <strong>admin@pistonhub.com</strong> /
-        <strong>admin123</strong>
+        Admin credentials are set on the server (see <strong>.env</strong>).
       </div>
     </div>
 
     <script src="script.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const user = getCurrentUser();
+      document.addEventListener('DOMContentLoaded', async () => {
+        const user = await fetchCurrentUser();
         if (user && user.isAdmin) {
           window.location.href = 'admin.html';
           return;
@@ -155,21 +155,20 @@
         const form = document.getElementById('adminLoginForm');
         const errorBox = document.getElementById('errorBox');
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
           e.preventDefault();
           errorBox.style.display = 'none';
 
           const email = document.getElementById('email').value.trim();
           const password = document.getElementById('password').value;
-          const result = loginUser({ email, password });
+          const result = await loginUser({ email, password });
           if (!result.ok) {
             errorBox.textContent = result.message || 'Unable to login';
             errorBox.style.display = 'block';
             return;
           }
-          const u = getCurrentUser();
-          if (!u || !u.isAdmin) {
-            logoutUser();
+          if (!result.user || !result.user.isAdmin) {
+            await logoutUser();
             errorBox.textContent = 'This account is not an admin.';
             errorBox.style.display = 'block';
             return;

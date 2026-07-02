@@ -100,6 +100,7 @@
         color: #bbb;
       }
     </style>
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
     <nav>
@@ -145,16 +146,12 @@
         <button class="btn" id="logoutBtn">Logout</button>
       </div>
 
-      <div class="note">
-        Admin login for demo: <strong>admin@pistonhub.com</strong> /
-        <strong>admin123</strong>
-      </div>
     </div>
 
     <script src="script.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const user = getCurrentUser();
+      document.addEventListener('DOMContentLoaded', async () => {
+        const user = await fetchCurrentUser();
         if (!user) {
           window.location.href = 'login.html';
           return;
@@ -172,9 +169,8 @@
           });
         }
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-          logoutUser();
-          updateAuthUI();
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+          await logoutUser();
           window.location.href = 'index.html';
         });
       });
