@@ -40,6 +40,16 @@ db.exec(`
   );
 `);
 
+// Migrate image paths from the old "all images/" folder (renamed to "images/",
+// spaces in file names replaced with hyphens) in databases created before the rename.
+db.prepare(
+  "UPDATE products SET image = REPLACE(REPLACE(image, 'all images/', 'images/'), ' ', '-') WHERE image LIKE 'all images/%'"
+).run();
+// Collapse the '---' left where file names had ' - ' (renamed to a single '-').
+db.prepare(
+  "UPDATE products SET image = REPLACE(image, '---', '-') WHERE image LIKE '%---%'"
+).run();
+
 function slugify(name) {
   return String(name).toLowerCase().trim().replace(/\s+/g, '-');
 }
@@ -47,18 +57,18 @@ function slugify(name) {
 // Products that already exist as static cards on the shop page,
 // seeded so the server can verify prices at checkout.
 const SEED_PRODUCTS = [
-  ['Apex Venom Gloves', 19.99, 'all images/Untitled design - 2024-05-07T124153.645.png', 'gloves'],
-  ['Apex Marvel Gloves', 19.99, 'all images/Untitled design - 2024-05-07T124348.301.png', 'gloves'],
-  ['Axor Gloves', 19.99, 'all images/Untitled design - 2024-05-07T124335.968.png', 'gloves'],
-  ['Apex Boots', 19.99, 'all images/Untitled design - 2024-05-07T124400.733.png', 'boots'],
-  ['Apex Marvel Boots', 19.99, 'all images/Untitled design - 2024-05-07T124411.595.png', 'boots'],
-  ['Apex Marvel Venom Helmet', 19.99, 'all images/axor venom.png', 'helmet'],
-  ['Apex Hunter Boots', 19.99, 'all images/Untitled design - 2024-05-07T124425.284.png', 'boots'],
-  ['Apex solid Boots', 29.99, 'all images/Untitled design - 2024-05-07T124517.576.png', 'boots'],
-  ['Apex Dynamo Helmet', 39.99, 'all images/axor helmet3.png', 'helmet'],
-  ['Retro Jet West Helmet', 49.99, 'all images/axor helmet4.png', 'helmet'],
-  ['Vega Max', 59.99, 'all images/axor helmet5.png', 'helmet'],
-  ['Apex Solid Helmet', 69.99, 'all images/axor pr6.png', 'helmet'],
+  ['Apex Venom Gloves', 19.99, 'images/Untitled-design-2024-05-07T124153.645.png', 'gloves'],
+  ['Apex Marvel Gloves', 19.99, 'images/Untitled-design-2024-05-07T124348.301.png', 'gloves'],
+  ['Axor Gloves', 19.99, 'images/Untitled-design-2024-05-07T124335.968.png', 'gloves'],
+  ['Apex Boots', 19.99, 'images/Untitled-design-2024-05-07T124400.733.png', 'boots'],
+  ['Apex Marvel Boots', 19.99, 'images/Untitled-design-2024-05-07T124411.595.png', 'boots'],
+  ['Apex Marvel Venom Helmet', 19.99, 'images/axor-venom.png', 'helmet'],
+  ['Apex Hunter Boots', 19.99, 'images/Untitled-design-2024-05-07T124425.284.png', 'boots'],
+  ['Apex solid Boots', 29.99, 'images/Untitled-design-2024-05-07T124517.576.png', 'boots'],
+  ['Apex Dynamo Helmet', 39.99, 'images/axor-helmet3.png', 'helmet'],
+  ['Retro Jet West Helmet', 49.99, 'images/axor-helmet4.png', 'helmet'],
+  ['Vega Max', 59.99, 'images/axor-helmet5.png', 'helmet'],
+  ['Apex Solid Helmet', 69.99, 'images/axor-pr6.png', 'helmet'],
 ];
 
 function seedProducts() {

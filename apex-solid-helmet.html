@@ -9,13 +9,13 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f4f4f4;
+        background-color: #ffffff;
       }
       .container {
         max-width: 1200px;
         margin: 20px auto;
         padding: 20px;
-        background-color: white;
+        background-color: rgb(255, 255, 255);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
       .product-image {
@@ -83,7 +83,7 @@
         font-size: 16px;
       }
       ::-webkit-scrollbar {
-        scrollbar-width: 0;
+        width: 0;
       }
       ::selection {
         background-color: orange;
@@ -189,32 +189,29 @@
     <link rel="stylesheet" href="responsive.css" />
   </head>
   <body>
-    <nav>
+        <nav>
       <div class="logo">
-        <a href="index.html"><img
-          src="all images/piston hub white.png"
-          alt="Piston Hub logo"
-        /></a>
+        <img
+          src="images/piston-hub-white.png"
+          alt="Accessories Emporium Logo"
+        />
       </div>
       <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="slider.html">Shop</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="contact us page.html">Contact</a></li>
-        <li><a href="cart.html">Cart</a></li>
-        <li><a id="navUserLink" href="login.html"><span id="navUserName">Login</span></a></li>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Shop</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
       </ul>
     </nav>
     <div class="container">
-      <a href="apex boots.html" target="_blank" rel="noopener noreferrer">
-        <img
-          src="axor gloves and boots/Untitled design - 2024-05-07T124400.733.png"
-          alt="Product Image"
-          class="product-image"
-      /></a>
+      <img
+        src="images/axor-pr6.png"
+        alt="Product Image"
+        class="product-image"
+      />
 
       <div class="product-details">
-        <h1 class="product-title">Apex Boots</h1>
+        <h1 class="product-title">Apex Solid Helmet</h1>
         <p class="product-price">₹500</p>
         <p class="product-description">
           This is a great product that you will love. It has many fantastic
@@ -223,8 +220,8 @@
         </p>
 
         <div class="buttons">
-          <button class="btn btn-buy" onclick="window.location.href='checkout.html'">Buy Now</button>
-          <button class="btn btn-cart" id="productAddToCart">Add to Cart</button>
+          <button class="btn btn-buy">Buy Now</button>
+          <button class="btn btn-cart">Add to Cart</button>
         </div>
 
         <div class="reviews">
@@ -245,11 +242,11 @@
         </div>
       </div>
     </div>
-    <footer>
+            <footer>
           <div class="footercomplete">
       <div class="containerfooter">
         <div class="column">
-          <img src="all images/Piston hub.png" alt="" class="footerimage"><br>
+          <img src="images/Piston-hub.png" alt="" class="footerimage"><br>
           <p><i>Piston Hub: Ignite Your Ride! Discover premium bike accessories and expert repair services at our Bike Gear Revive Hub.</i></p>
         </div>
         <div class="column">
@@ -281,22 +278,5 @@
       </div>
      
     </footer>
-    <script src="script.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('productAddToCart');
-        if (!btn) return;
-        btn.addEventListener('click', () => {
-          const product = {
-            id: 'apex-boots',
-            name: 'Apex Boots',
-            price: 500,
-            image: 'axor gloves and boots/Untitled design - 2024-05-07T124400.733.png'
-          };
-          addToCart(product, 1);
-          alert('Apex Boots added to cart');
-        });
-      });
-    </script>
   </body>
 </html>

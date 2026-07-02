@@ -1,7 +1,13 @@
 # Piston Hub — Bike Accessory Store
 
-Static HTML/CSS/JS storefront with a Node.js (Express + SQLite) backend for
-authentication, product management, and orders.
+Full-stack e-commerce store: HTML/CSS/JS storefront with a Node.js
+(Express + SQLite) backend for authentication, product management, and orders.
+
+> **Live demo note:** the GitHub Pages link
+> (https://yuvrajbhagyedh.github.io/Piston-hub-Bike-accessory-website/) serves
+> the **static storefront only** — Pages cannot run the Node backend, so
+> login, admin, and checkout won't work there. For the full version, run it
+> locally (below) or deploy the backend to Render (see "Deploy to Render").
 
 ## Run it
 
@@ -51,6 +57,19 @@ folder are gitignored and must never be committed.
 | POST | `/api/orders` | logged-in users |
 | GET | `/api/orders/mine` | logged-in users |
 | GET/DELETE | `/api/admin/orders` | admin |
+
+## Deploy to Render (free)
+
+The repo includes a [render.yaml](render.yaml) blueprint:
+
+1. Go to https://dashboard.render.com → **New → Blueprint** and pick this repo.
+2. Set the `ADMIN_PASSWORD` env var when prompted (`SESSION_SECRET` is
+   auto-generated).
+3. Deploy — the app serves both the site and the API from one URL.
+
+Note: on the free plan the SQLite file lives on ephemeral disk, so products
+and orders reset on each deploy/restart (fine for a demo). Add a Render disk
+or switch to Postgres for persistence.
 
 ## Known limitations (demo scope)
 

@@ -57,7 +57,7 @@ nav ul li a {
     height: 100vh;
     text-align: center;
     padding: 100px 0;
-    background-image:url("all images/MY-24-KTM-SUPERSPORT-RC-125.jpg");
+    background-image:url("images/MY-24-KTM-SUPERSPORT-RC-125.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     opacity:.7 ;
@@ -216,12 +216,12 @@ nav ul li a {
 }
 
 .image:hover[data-hover-image] {
-  content: url("MY-24-KTM-SUPERSPORT-RC-125.jpg"); 
+  content: url("images/MY-24-KTM-SUPERSPORT-RC-125.jpg"); 
   width: 25%;
   height: 25%; /* Replaces image with hover image on hover */
 }
 .imagehover-effect1:hover[data-hover-image] {
-  content: url("MY-24-KTM-SUPERSPORT-RC-390.jpg"); 
+  content: url("images/MY-24-KTM-SUPERSPORT-RC-390.jpg"); 
   width: 25%;
   height: 25%; /* Replaces image with hover image on hover */
 }

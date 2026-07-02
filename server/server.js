@@ -8,8 +8,9 @@ const bcrypt = require('bcryptjs');
 const ROOT = path.join(__dirname, '..');
 const ENV_PATH = path.join(ROOT, '.env');
 
-// First run: generate a .env with random secrets so nothing is hardcoded.
-if (!fs.existsSync(ENV_PATH)) {
+// First local run: generate a .env with random secrets so nothing is
+// hardcoded. Skipped when secrets come from the environment (e.g. Render).
+if (!fs.existsSync(ENV_PATH) && !process.env.SESSION_SECRET) {
   const sessionSecret = crypto.randomBytes(32).toString('hex');
   const adminPassword = crypto.randomBytes(9).toString('base64url');
   fs.writeFileSync(
@@ -21,7 +22,8 @@ if (!fs.existsSync(ENV_PATH)) {
   console.log(`[setup] Admin login: admin@pistonhub.com / ${adminPassword}`);
   console.log('[setup] (Saved in .env — change it there if you want your own.)');
 }
-process.loadEnvFile(ENV_PATH);
+// Existing environment variables take precedence over .env values.
+if (fs.existsSync(ENV_PATH)) process.loadEnvFile(ENV_PATH);
 
 const { db, slugify, seedProducts, seedAdmin } = require('./db');
 
@@ -36,6 +38,9 @@ if (process.env.ADMIN_PASSWORD) {
 
 const app = express();
 app.disable('x-powered-by');
+// Behind a reverse proxy (e.g. Render) trust X-Forwarded-* so secure
+// cookies and req.ip (rate limiting) work correctly.
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '100kb' }));
 
 app.use(
@@ -212,8 +217,8 @@ function validateProduct(body) {
   if (!Number.isFinite(price) || price < 0 || price > 1000000) {
     return { error: 'Price must be a number between 0 and 1,000,000' };
   }
-  if (image && !/^(all images\/|https:\/\/)/.test(image)) {
-    return { error: 'Image must be a path under "all images/" or an https:// URL' };
+  if (image && !/^(images\/|https:\/\/)/.test(image)) {
+    return { error: 'Image must be a path under "images/" or an https:// URL' };
   }
   return { product: { name, price, image, category: category || 'other', description, stock } };
 }
