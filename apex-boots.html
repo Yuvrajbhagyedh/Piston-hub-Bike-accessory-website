@@ -226,7 +226,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="product-details">
         <h1 class="product-title">Apex Boots</h1>
-        <p class="product-price">₹500</p>
+        <p class="product-price">₹3,499</p>
         <p class="product-description">
           This is a great product that you will love. It has many fantastic
           features and benefits that will make your life easier and more
@@ -234,7 +234,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </p>
 
         <div class="buttons">
-          <button class="btn btn-buy" onclick="window.location.href='checkout.html'">Buy Now</button>
+          <button class="btn btn-buy">Buy Now</button>
           <button class="btn btn-cart" id="productAddToCart">Add to Cart</button>
         </div>
 
@@ -293,21 +293,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      
     </footer>
     <script src="script.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('productAddToCart');
-        if (!btn) return;
-        btn.addEventListener('click', () => {
-          const product = {
-            id: 'apex-boots',
-            name: 'Apex Boots',
-            price: 500,
-            image: 'images/Untitled-design-2024-05-07T124400.733.png'
-          };
-          addToCart(product, 1);
-          alert('Apex Boots added to cart');
-        });
-      });
-    </script>
+    <script src="analytics.js"></script>
   </body>
 </html>
